@@ -1,5 +1,7 @@
 {
     "require": {
-        "electrolinux/phpquery": "^0.9.6"
+        "electrolinux/phpquery": "^0.9.6",
+        "noahbuscher/macaw": "dev-master",
+        "twig/twig": "^1.34"
     }
 }

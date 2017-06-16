@@ -1,0 +1,22 @@
+{
+  "name": "awesome-crawler",
+  "version": "1.0.0",
+  "description": "Required packages for our awesome crawler",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-meladawy:meladawy/awesome-crawler.git"
+  },
+  "author": "",
+  "license": "ISC"
+}

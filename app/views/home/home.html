@@ -1,0 +1,14 @@
+{% extends "layout/base.html" %}
+
+{# OVERRIDE PAGE TITLE #}
+{% block title %}Home Page{% endblock %}
+
+{# OVERRIDE CONTENT BLOCK#}
+{% block content %}
+
+<form action="process" method="POST">
+  <input type="url"  name="url"/>
+  <input type="submit" />
+</form>
+
+{% endblock %}
