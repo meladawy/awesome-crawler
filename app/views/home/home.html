@@ -3,12 +3,20 @@
 {# OVERRIDE PAGE TITLE #}
 {% block title %}Home Page{% endblock %}
 
+{# ADD JAVASCRIPT #}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{front_page}}/lib/highlight/highlight.pack.js"></script>
+    <link rel="stylesheet" href="{{front_page}}/lib/highlight/styles/default.css">
+    <script type="text/javascript" src="{{front_page}}/scripts/pages/home.js"></script>
+{% endblock %}
+
 {# OVERRIDE CONTENT BLOCK#}
 {% block content %}
 
-<form action="process" method="POST">
+<form action="process" method="POST" id="crawling">
   <div class="input-group" id="adv-search">
-    <input type="url" name="url" class="form-control" placeholder="http://website.com" />
+    <input type="url" name="url" class="form-control" placeholder="http://website.com" required/>
 
     <div class="input-group-btn">
       <div class="btn-group" role="group">
@@ -16,22 +24,50 @@
           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></button>
           <div class="dropdown-menu dropdown-menu-right" role="menu">
             <div class="form-group">
-              <label for="filter">Filter by</label>
-              <select class="form-control">
-                <option value="0" selected>All Snippets</option>
-                <option value="1">Featured</option>
-                <option value="2">Most popular</option>
-                <option value="3">Top rated</option>
-                <option value="4">Most commented</option>
-              </select>
+              <label for="filter">Options:</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" name="recurrsive" checked>
+                  Recurssive Crowling - Crawl all the links attached to the current page
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" value="images" name="elements" checked>
+                  Images
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" value="js" name="elements" checked>
+                  JS Files
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" value="css" name="elements" checked>
+                  CSS Files
+                </label>
+              </div>
             </div>
           </div>
         </div>
-        
-        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+
+        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
       </div>
     </div>
   </div>
 </form>
 
+<div class="loading-wrapper hide">
+  <img src="{{ front_page }}/images/loading.gif" />
+  <div class="loading-text">Here we go..</div>
+</div>
+
+<div class="code-wrapper text-left hide">
+  <pre>
+    <code class="json">
+    </code>
+  </pre>
+</div>
 {% endblock %}

@@ -11,6 +11,8 @@ define('CONTROLLERS_PATH', BASE_PATH . '/app/controllers/');
 define('LIB_PATH', BASE_PATH . '/vendor/');
 // HELPERS FUNCTIONS PATH.
 define('HELPERS_PATH', BASE_PATH . '/include/');
+// CUSTOM HANDLERS PATH.
+define('CUSTOM_HELPERS_PATH', BASE_PATH . '/app/helpers');
 
 
 /**
@@ -44,16 +46,26 @@ define('FRONT_PATH', str_replace(request_path(), "", "http://".$_SERVER['SERVER_
 include(BASE_PATH . '/config/routes.php');
 
 /**
-* Load the Controllers
-* @param string $class
-*/
-function controllersAutoLoader($class){
-  $class=strtolower($class);
-  $classFile=CONTROLLERS_PATH.$class.'.php';
+ * Load the Controllers and Handlers.
+ *
+ * @param string $class
+ */
+function controllersHandlersAutoLoader($class){
+  // Autoload Controllers.
+  if (strpos($class, 'Controller') !== false) {
+    $classFile=CONTROLLERS_PATH.DIRECTORY_SEPARATOR.$class.'.php';
+  }
+
+  // Autoload Helpers.
+  if (strpos($class, 'Helper') !== false) {
+    $classFile=CUSTOM_HELPERS_PATH.DIRECTORY_SEPARATOR.$class.'.php';
+  }
+
   if(is_file($classFile)&&!class_exists($class)) include $classFile;
 }
-spl_autoload_register('controllersAutoLoader');
 
+
+spl_autoload_register('controllersHandlersAutoLoader');
 
 $router = new Router ;
 $router->loadRoutes($routes) ;
