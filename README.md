@@ -50,7 +50,7 @@ This project is more inspired by Symfony folders structure with some customizati
 I built this project to be more dynamic and easily to extend. you can even parse your custom output from the crawled pages. Lets say for example that you want to display all the `Titles` for the page by reading the text inside `<h1>` and `<h2>` tages. We can achieve this by doing the following :- 
 
 1. Define a new element in `/config/elements.php`. Assuming that the new element name will be `titles` then the definition should be like this 
-```
+```php
   'titles' => array(
     'group' => 'text', // The group of the final JSON output
     'class' => 'TitlesElement',
@@ -59,7 +59,7 @@ I built this project to be more dynamic and easily to extend. you can even parse
 ```
 
 So the final output of the page should be like this 
-```
+```php
 <?php
 
 /**
@@ -94,7 +94,7 @@ $elements = array(
 
 2. Create `/app/elements/TitlesElement.php` file that define `TitlesElement` class. This class should define the static funciton `output`. Here is how the final class should looks like :
 
-```
+```php
 <?php
 
 /**
