@@ -9,15 +9,20 @@ $(document).ready(function () {
     e.stopPropagation();
   });
 
-  // Initliaze Syntax Highlighter
-  initializeSyntaxHighlighter();
-
   // Submitting crawling form.
   $("form#crawling").submit(function (e) {
     // Get Form Options.
     // get all the inputs into an array.
     var elementCounter = 0;
     var linksToCrowl = [];
+    // Hide code block
+    disableCodeBlock();
+    // Reset previous results.
+    retrievedUrlsData = [];
+    numOfItemsRetrieved = 0;
+    options = {};
+    options['elements'] = [];
+    $('.loading-wrapper .loading-text').text('Loading');
 
     // Load Recurrsive option into options object.
     options['recurrsive'] = ($(this).find("input[name='recurrsive']:checked").length > 0) ? true : false;
@@ -52,9 +57,7 @@ $(document).ready(function () {
       // Make Ajax Request.
       $.post( "ajax/elements", {urls: urls, elements: elements}, function (data) {
         // Replace code highlighter with retrieved JSON and disable loading
-        $(".code-wrapper code").text(data);
-        initializeSyntaxHighlighter();
-        $(".code-wrapper").removeClass("hide");
+        enableCodeBlock(data);
         disableLoading();
       });
 
@@ -80,7 +83,6 @@ $(document).ready(function () {
         // Retrieve bulk of links
         retrieveLinks(linksToCrowl);
       });
-
 
     }
 
@@ -120,12 +122,22 @@ $(document).ready(function () {
    }
 
    /**
-    * Initialize Syntax Highlighter.
+    * Enable Code Block.
     */
-   function initializeSyntaxHighlighter() {
-     $('pre code').each(function (i, block) {
-       hljs.highlightBlock(block);
-     });
+   function enableCodeBlock(text) {
+     $(".code-wrapper code").text(text);
+     $('.code-wrapper code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+     $(".code-wrapper").removeClass("hide");
+   }
+
+   /**
+    * Disable Code Block
+    */
+   function disableCodeBlock() {
+     $(".code-wrapper code").text('');
+     $(".code-wrapper").addClass("hide");
    }
 
    /**
@@ -140,7 +152,7 @@ $(document).ready(function () {
      if(linksToCrowl.length > 0) {
        // Get patch of urls to request.
       $.each(linksToCrowl, function (index, value) {
-        if (perRequestLimit == 0) {
+        if (perRequestLimit == 0 && linksToCrowl.length > 10) {
           return false;
         }
         perRequestUrls.push(value);
@@ -161,13 +173,9 @@ $(document).ready(function () {
      }
      else {
        if(retrievedUrlsData.length > 0) {
-         console.log(retrievedUrlsData);
          // Replace code highlighter with retrieved JSON and disable loading
-         $(".code-wrapper code").text(JSON.stringify(retrievedUrlsData, null, "\t"));
-         initializeSyntaxHighlighter();
-         $(".code-wrapper").removeClass("hide");
+         enableCodeBlock(JSON.stringify(retrievedUrlsData, null, "\t"));
        }
-
        disableLoading();
      }
    }

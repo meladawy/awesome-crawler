@@ -53,7 +53,7 @@ class LinksController extends Controller {
     // Get links in current website.
     $links = $this->getLinks($markup);
 
-    print json_encode($links, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+    print json_encode($links, JSON_UNESCAPED_SLASHES);
   }
 
 
@@ -84,7 +84,8 @@ class LinksController extends Controller {
         $links_array[] = pq($link)->attr("href");
       }
     }
-    return $links_array;
+
+    return array_merge(array_unique($links_array), array());
   }
 
   private function getMarkupByURL($url) {
