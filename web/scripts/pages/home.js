@@ -1,23 +1,26 @@
+/**
+ * @file
+ * Handle different JS functionality for crawler homepage.
+ */
+
 $(document).ready(function () {
+  // Initialize global variables.
   var numOfItemsRetrieved = 0;
   var retrievedUrlsData = [];
+  var linksToCrowl = [];
   var options = {};
   options['elements'] = [];
 
-  // Don't close the dropdown then click on the labels.
+  // Don't close the dropdown when click on the labels.
   $('.dropdown-menu input, .dropdown-menu label').click(function (e) {
     e.stopPropagation();
   });
 
   // Submitting crawling form.
   $("form#crawling").submit(function (e) {
-    // Get Form Options.
-    // get all the inputs into an array.
-    var elementCounter = 0;
-    var linksToCrowl = [];
-    // Hide code block
+    // Hide code block if visible from previous searches.
     disableCodeBlock();
-    // Reset previous results.
+    // Reset previous searches variables.
     retrievedUrlsData = [];
     numOfItemsRetrieved = 0;
     options = {};
@@ -28,10 +31,8 @@ $(document).ready(function () {
     options['recurrsive'] = ($(this).find("input[name='recurrsive']:checked").length > 0) ? true : false;
 
     // Load all checked elements options into the options object.
-    $(this).find("input[name='elements']:checked").each(function () {
-      options['elements'][elementCounter] = this.value;
-      elementCounter++
-    })
+    let elementCounter = 0;
+    options = getFormOptions();
 
     // If user didn't select enough elements to display (Images, CSS, JS..etc)
     if (options['elements'].length == 0) {
@@ -42,53 +43,71 @@ $(document).ready(function () {
     // Enable loading mode.
     enableLoading();
 
-    // If recurssive disabled, Retrieve page elements directrly.
+    // If recurssive crawling disabled ,then retrieve page elements directrly.
     if (!options['recurrsive']) {
       // Update loading text.
       updateLoadingText("Fetching stuff from the page..");
-      // If user didn't select enough elements to display (Images, CSS, JS..etc)
-      if (options['elements'].length == 0) {
-        alert("Ooops. you didn't pick enough elements to display!");
-        disableLoading();
-      }
-      // Prepare Ajax Parameters
+
+      // Prepare Ajax POST Parameters.
       var urls = $("input[name='url']").val();
       var elements = options['elements'].join(",");
-      // Make Ajax Request.
-      $.post( "ajax/elements", {urls: urls, elements: elements}, function (data) {
-        // Replace code highlighter with retrieved JSON and disable loading
+
+      // Make Ajax Request to retrieve elements for current page only (Recurrsive mode disabled).
+      $.post("ajax/elements", {urls: urls, elements: elements}, function (data) {
+        // Replace code highlighter with retrieved JSON and disable loading.
         enableCodeBlock(data);
         disableLoading();
       });
 
     }
 
-    // If recurrsive option enabled
+    // If recurrsive option enabled.
     if (options['recurrsive']) {
       // Update loading text.
       updateLoadingText("Retrieve internal links..");
       // Make Ajax Request to Retrieve internal links.
       var url = $("input[name='url']").val();
       var links = [];
-      $.post( "ajax/links", {url: url}, function (data) {
-        linksToCrowl = JSON.parse(data);
-        // In case of no links retrieved;
-        if(linksToCrowl.length == 0) {
+      $.post("ajax/links", {url: url}, function (data) {
+        data = JSON.parse(data);
+
+        if(data.status && data.status == "error") {
+          alert(data.message);
+          disableLoading();
+          return false;
+        }
+
+        linksToCrowl = data;
+
+        // In case of no links retrieved;.
+        if (linksToCrowl.length == 0) {
           disableLoading();
           alert("We didn't find any links for this website");
           return false;
         }
         // Founds links update text.
         updateLoadingText("Found " + linksToCrowl.length + " links to crawl in this page. Lets start the fun!");
-        // Retrieve bulk of links
+        // Retrieve bulk of links.
         retrieveLinks(linksToCrowl);
       });
 
     }
 
-
     e.preventDefault();
   });
+
+  /**
+   * Get form options values.
+   */
+  function getFormOptions() {
+    let elementCounter = 0;
+    $("form#crawling").find("input[name='elements']:checked").each(function () {
+      options['elements'][elementCounter] = this.value;
+      elementCounter++
+    })
+
+    return options;
+  }
 
   /**
    * Enable disable mode for the page.
@@ -126,14 +145,14 @@ $(document).ready(function () {
     */
    function enableCodeBlock(text) {
      $(".code-wrapper code").text(text);
-     $('.code-wrapper code').each(function(i, block) {
+     $('.code-wrapper code').each(function (i, block) {
         hljs.highlightBlock(block);
       });
      $(".code-wrapper").removeClass("hide");
    }
 
    /**
-    * Disable Code Block
+    * Disable Code Block.
     */
    function disableCodeBlock() {
      $(".code-wrapper code").text('');
@@ -141,15 +160,15 @@ $(document).ready(function () {
    }
 
    /**
-    * Retrieve bulk of data
+    * Retrieve bulk of data.
     */
    function retrieveLinks(linksToCrowl) {
-     // Per request limit
+     // Per request limit.
      let perRequestLimit = 10;
-     // Urls to pull
+     // Urls to pull.
      let perRequestUrls = [];
 
-     if(linksToCrowl.length > 0) {
+     if (linksToCrowl.length > 0) {
        // Get patch of urls to request.
       $.each(linksToCrowl, function (index, value) {
         if (perRequestLimit == 0 && linksToCrowl.length > 10) {
@@ -164,7 +183,7 @@ $(document).ready(function () {
       let urls = perRequestUrls.join(",");
       let elements = options['elements'].join(",");
 
-      $.post( "ajax/elements", {urls: urls, elements: elements}, function (data) {
+      $.post("ajax/elements", {urls: urls, elements: elements}, function (data) {
         data = JSON.parse(data);
         retrievedUrlsData = retrievedUrlsData.concat(data);
         updateLoadingText(linksToCrowl.length + " URLs remaining");
@@ -172,10 +191,11 @@ $(document).ready(function () {
       });
      }
      else {
-       if(retrievedUrlsData.length > 0) {
-         // Replace code highlighter with retrieved JSON and disable loading
+       if (retrievedUrlsData.length > 0) {
+         // Replace code highlighter with retrieved JSON and disable loading.
          enableCodeBlock(JSON.stringify(retrievedUrlsData, null, "\t"));
        }
+
        disableLoading();
      }
    }

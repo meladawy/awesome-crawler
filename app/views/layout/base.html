@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    {% block head %}
+      <!-- Bootstrap : Latest compiled and minified CSS  -->
+      <link rel="stylesheet" href="{{front_page}}/lib/bootstrap/css/bootstrap.min.css">
+      <!-- Bootstrap : Optional theme -->
+      <link rel="stylesheet" href="{{front_page}}/lib/bootstrap/css/bootstrap-theme.min.css">
+      <!-- Basic Style-->
+      <link rel="stylesheet" type="text/css" href="{{front_page}}/styles/style.css" />
+      <!-- Bootstrap : Latest compiled and minified JavaScript & jQuery -->
+      <script src="{{front_page}}/lib/jquery/jquery-1.12.4.min.js"></script>
+      <script src="{{front_page}}/lib/bootstrap/js/bootstrap.min.js"></script>
+      {% block javascripts %}{% endblock %}
+      <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+  </head>
 
-<head>
-  {% block head %}
-  <!-- Bootstrap : Latest compiled and minified CSS  -->
-  <link rel="stylesheet" href="{{front_page}}/lib/bootstrap/css/bootstrap.min.css">
-  <!-- Bootstrap : Optional theme -->
-  <link rel="stylesheet" href="{{front_page}}/lib/bootstrap/css/bootstrap-theme.min.css">
-  <!-- Basic Style-->
-  <link rel="stylesheet" type="text/css" href="{{front_page}}/styles/style.css" />
-  <!-- Bootstrap : Latest compiled and minified JavaScript & jQuery -->
-  <script src="{{front_page}}/lib/jquery/jquery-1.12.4.min.js"></script>
-  <script src="{{front_page}}/lib/bootstrap/js/bootstrap.min.js"></script>
-  {% block javascripts %}{% endblock %}
-  <title>{% block title %}{% endblock %}</title>
-  {% endblock %}
-</head>
-
-<body id="wrapper">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12 text-center">
-        <div id="content">{% block content %}{% endblock %}</div>
+  <body id="wrapper">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <div id="content">{% block content %}{% endblock %}</div>
+        </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
