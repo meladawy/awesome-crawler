@@ -7,6 +7,6 @@
 
 $routes = array(
   '/' => array('controller' => 'HomeController', 'action' => 'index'),
-  'process' => array('controller' => 'ProcessController', 'action' => 'index'),
+  'ajax/links' => array('controller' => 'LinksController', 'action' => 'index'),
   'ajax/elements' => array('controller' => 'ElementsController', 'action' => 'index'),
 );

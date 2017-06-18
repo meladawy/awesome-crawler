@@ -1,4 +1,9 @@
 $(document).ready(function () {
+  var numOfItemsRetrieved = 0;
+  var retrievedUrlsData = [];
+  var options = {};
+  options['elements'] = [];
+
   // Don't close the dropdown then click on the labels.
   $('.dropdown-menu input, .dropdown-menu label').click(function (e) {
     e.stopPropagation();
@@ -11,9 +16,8 @@ $(document).ready(function () {
   $("form#crawling").submit(function (e) {
     // Get Form Options.
     // get all the inputs into an array.
-    var options = {};
-    options['elements'] = [];
     var elementCounter = 0;
+    var linksToCrowl = [];
 
     // Load Recurrsive option into options object.
     options['recurrsive'] = ($(this).find("input[name='recurrsive']:checked").length > 0) ? true : false;
@@ -56,6 +60,31 @@ $(document).ready(function () {
 
     }
 
+    // If recurrsive option enabled
+    if (options['recurrsive']) {
+      // Update loading text.
+      updateLoadingText("Retrieve internal links..");
+      // Make Ajax Request to Retrieve internal links.
+      var url = $("input[name='url']").val();
+      var links = [];
+      $.post( "ajax/links", {url: url}, function (data) {
+        linksToCrowl = JSON.parse(data);
+        // In case of no links retrieved;
+        if(linksToCrowl.length == 0) {
+          disableLoading();
+          alert("We didn't find any links for this website");
+          return false;
+        }
+        // Founds links update text.
+        updateLoadingText("Found " + linksToCrowl.length + " links to crawl in this page. Lets start the fun!");
+        // Retrieve bulk of links
+        retrieveLinks(linksToCrowl);
+      });
+
+
+    }
+
+
     e.preventDefault();
   });
 
@@ -97,6 +126,50 @@ $(document).ready(function () {
      $('pre code').each(function (i, block) {
        hljs.highlightBlock(block);
      });
-  }
+   }
+
+   /**
+    * Retrieve bulk of data
+    */
+   function retrieveLinks(linksToCrowl) {
+     // Per request limit
+     let perRequestLimit = 10;
+     // Urls to pull
+     let perRequestUrls = [];
+
+     if(linksToCrowl.length > 0) {
+       // Get patch of urls to request.
+      $.each(linksToCrowl, function (index, value) {
+        if (perRequestLimit == 0) {
+          return false;
+        }
+        perRequestUrls.push(value);
+        linksToCrowl.splice(index, 1);
+        perRequestLimit--;
+      });
+
+      // Prepare variables for POST request.
+      let urls = perRequestUrls.join(",");
+      let elements = options['elements'].join(",");
+
+      $.post( "ajax/elements", {urls: urls, elements: elements}, function (data) {
+        data = JSON.parse(data);
+        retrievedUrlsData = retrievedUrlsData.concat(data);
+        updateLoadingText(linksToCrowl.length + " URLs remaining");
+        retrieveLinks(linksToCrowl);
+      });
+     }
+     else {
+       if(retrievedUrlsData.length > 0) {
+         console.log(retrievedUrlsData);
+         // Replace code highlighter with retrieved JSON and disable loading
+         $(".code-wrapper code").text(JSON.stringify(retrievedUrlsData, null, "\t"));
+         initializeSyntaxHighlighter();
+         $(".code-wrapper").removeClass("hide");
+       }
+
+       disableLoading();
+     }
+   }
 
 });
