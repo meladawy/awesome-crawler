@@ -15,6 +15,8 @@ define('LIB_PATH', BASE_PATH . '/vendor/');
 define('HELPERS_PATH', BASE_PATH . '/include/');
 // CUSTOM HANDLERS PATH.
 define('CUSTOM_HELPERS_PATH', BASE_PATH . '/app/helpers');
+// CUSTOM ELEMENTS PATH.
+define('CUSTOM_ELEMENTS_PATH', BASE_PATH . '/app/elements');
 
 
 /**
@@ -26,6 +28,8 @@ include HELPERS_PATH . '/http.php';
 include HELPERS_PATH . '/Router.php';
 // Include the base controller.
 include HELPERS_PATH . '/Controller.php';
+// Include the base controller.
+include HELPERS_PATH . '/Elements.php';
 // Include the defined routes.
 include BASE_PATH . '/config/routes.php';
 
@@ -41,12 +45,12 @@ else {
 }
 
 /**
- * Load the Controllers and Handlers.
+ * Load the Controllers, Handlers and Elements.
  *
  * @param string $class
  *   Class name to search for.
  */
-function controllers_handlers_autoloader($class) {
+function cawler_autoloader($class) {
   // Autoload Controllers.
   if (strpos($class, 'Controller') !== FALSE) {
     $classFile = CONTROLLERS_PATH . DIRECTORY_SEPARATOR . $class . '.php';
@@ -57,12 +61,17 @@ function controllers_handlers_autoloader($class) {
     $classFile = CUSTOM_HELPERS_PATH . DIRECTORY_SEPARATOR . $class . '.php';
   }
 
+  // Autoload Elements.
+  if (strpos($class, 'Element') !== FALSE && strpos($class, 'Controller') == FALSE) {
+    $classFile = CUSTOM_ELEMENTS_PATH . DIRECTORY_SEPARATOR . $class . '.php';
+  }
+
   if (is_file($classFile)&&!class_exists($class)) {
     include $classFile;
   }
 }
 
-spl_autoload_register('controllers_handlers_autoloader');
+spl_autoload_register('cawler_autoloader');
 
 $router = new Router();
 $router->loadRoutes($routes);

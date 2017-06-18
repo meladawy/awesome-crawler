@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * JSON helper class to handle some functions related to parsing and outputing JSON response.
  */
 class JsonHelper {
 
@@ -32,7 +32,8 @@ class JsonHelper {
    * @param string $json
    *   The original JSON string to process.
    *
-   * @return string Indented version of the original JSON string.
+   * @return string
+   *   Indented version of the original JSON string.
    */
   public function indent($json) {
     $result = '';

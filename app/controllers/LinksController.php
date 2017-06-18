@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Output internal links included in a specific website markup.
+ */
+
 use \phpQuery;
 use Curl\Curl;
 
@@ -7,16 +12,13 @@ use Curl\Curl;
  * Links Controller that retrieve links for a particular page.
  */
 class LinksController extends Controller {
-  /**
-   * I use this private variables for redirect.
-   */
   private $curl;
   private $website = '';
   private $response = array();
   private $jsonHelper;
 
   /**
-   * Constructor function to initialize curl funciton.
+   * Constructor function to initialize curl object and JSON Helper.
    */
   public function __construct() {
     $this->curl = new Curl();
@@ -26,7 +28,7 @@ class LinksController extends Controller {
   }
 
   /**
-   * Process handling function.
+   * Callback function for 'ajax/links' page.
    */
   public function index() {
     // Initialize variables.
@@ -50,15 +52,15 @@ class LinksController extends Controller {
     // Set output markup for current URL.
     $markup = $this->curl->response;
 
-    // Get links in current website.
+    // Get links for current website markup.
     $links = $this->getLinks($markup);
 
     print json_encode($links, JSON_UNESCAPED_SLASHES);
   }
 
-
   /**
-   * Get Links inside current markup. We only filter links that related to current website and skip any link for any external website.
+   * Get Links inside current markup. We only display current website links and
+   * Skip links for external websites or subdomains.
    *
    * @return array
    *   Array of links.
@@ -88,21 +90,6 @@ class LinksController extends Controller {
     return array_merge(array_unique($links_array), array());
   }
 
-  private function getMarkupByURL($url) {
-    // Retrieve HTML Markup for the page.
-    $this->curl->get($url);
-
-    // If Something went wrong.
-    if ($this->curl->error) {
-      return false;
-    }
-
-    // Set output markup for current URL.
-    $markup = $this->curl->response;
-
-    return $markup;
-  }
-
   /**
    * Get domain name from url.
    *
@@ -117,4 +104,5 @@ class LinksController extends Controller {
     preg_match_all("%^(?:https?://)?(?:[^@/n]+@)?(?:www.)?([^:/n]+)%", $url, $matches);
     return !empty($matches[1][0]) ? $matches[1][0] : FALSE;
   }
+
 }

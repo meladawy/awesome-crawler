@@ -28,27 +28,18 @@
               <div class="checkbox">
                 <label>
                   <input type="checkbox" name="recurrsive" checked>
-                  Recurssive Crowling - Crawl all the links attached to the current page
+                  RECURRSIVE CROWLING - Crawl all the links attached to the current page
                 </label>
               </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="images" name="elements" checked>
-                  Images
-                </label>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="js" name="elements" checked>
-                  JS Files
-                </label>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="css" name="elements" checked>
-                  CSS Files
-                </label>
-              </div>
+
+              {% for element in elements %}
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="{{ element.name }}" name="elements" checked>
+                    {{ element.name|upper }} - {{ element.description|capitalize }}
+                  </label>
+                </div>
+              {% endfor %}
             </div>
           </div>
         </div>

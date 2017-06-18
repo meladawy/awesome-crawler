@@ -13,7 +13,10 @@ class HomeController extends Controller {
    * Homepage Landing function.
    */
   public function index() {
-    $output = $this->render('home/home.html');
+    $elements_handler = new Elements();
+    $elements = $elements_handler->get_elements();
+
+    $output = $this->render('home/home.html', array('elements' => $elements));
     echo $output;
   }
 

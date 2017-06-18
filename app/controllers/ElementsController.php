@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Output elements included in a specific website markup.
+ */
+
 use \phpQuery;
 use Curl\MultiCurl;
 
@@ -12,6 +17,7 @@ class ElementsController extends Controller {
   private $elements;
   private $jsonHelper;
   private $response;
+  private $element_handler;
 
   /**
    * Constructor function to initialize curl funciton.
@@ -22,6 +28,7 @@ class ElementsController extends Controller {
 
     $this->jsonHelper = new JsonHelper();
     $this->response = array();
+    $this->element_handler = new Elements();
   }
 
   /**
@@ -46,7 +53,7 @@ class ElementsController extends Controller {
       $this->updateResponse($instance->url, $instance->response);
     });
 
-    foreach($this->urls as $url) {
+    foreach ($this->urls as $url) {
       $this->curl->addGet($url);
     }
 
@@ -55,88 +62,48 @@ class ElementsController extends Controller {
     print $this->jsonHelper->indent(json_encode($this->response, JSON_UNESCAPED_SLASHES));
   }
 
+  /**
+   * Build response object structure.
+   */
   private function updateResponse($url, $markup) {
     $response_item = array();
     $response_item['url'] = $url;
     $response_item['assets'] = array();
 
-    $images = (in_array("images", $this->elements)) ? $this->getImages($markup) : array();
-    $js = (in_array("js", $this->elements)) ? $this->getJS($markup) : array();
-    $css = (in_array("css", $this->elements)) ? $this->getCSS($markup) : array();
-
-    if(count($images) > 0) {
-      foreach($images as $image) {
-        $response_item['assets'][] = $image;
+    // Display each output from custom elements.
+    foreach ($this->elements as $element_name) {
+      $element = $this->element_handler->get_element_by_name($element_name);
+      $element_output = call_user_func($element['class'] .'::output', $markup);
+      // Convert relative urls to absolute.
+      foreach($element_output as $key => $value) {
+        if(substr($value, 0, 1) === '/' && substr($value, 0, 6) != '//www.') {
+          $element_output[$key] = $this->getDomainFromUrl($url) . $value;
+        }
       }
-    }
-
-    if(count($js) > 0) {
-      foreach($js as $js_item) {
-        $response_item['assets'][] = $js_item;
+      // If group is not initialized before, then just initialize it.
+      if(empty($response_item[$element['group']])) {
+        $response_item[$element['group']] = array();
       }
-    }
 
-    if(count($css) > 0) {
-      foreach($css as $css_item) {
-        $response_item['assets'][] = $css_item;
-      }
+      $response_item[$element['group']] = array_merge($response_item[$element['group']], $element_output) ;
     }
 
     $this->response[] = $response_item;
   }
 
   /**
-   * Get images for current markup.
-   */
-  private function getImages($markup) {
-    $images_array = [];
-    $page_markup = phpQuery::newDocumentHTML($markup, $charset = 'utf-8');
-    $images = pq("img", $page_markup);
-
-    foreach ($images as $image) {
-      if (!empty(pq($image)->attr("src"))) {
-        $images_array[] = pq($image)->attr("src");
-      }
-    }
-
-    return array_unique($images_array);
-  }
-
-  /**
-   * Get JS files in current markup.
-   */
-  private function getJS($markup) {
-    $js_array = [];
-    $page_markup = phpQuery::newDocumentHTML($markup, $charset = 'utf-8');
-    $js = pq("script", $page_markup);
-
-    foreach ($js as $js_item) {
-      if (!empty(pq($js_item)->attr("src"))) {
-        $js_array[] = pq($js_item)->attr("src");
-      }
-    }
-
-    return array_unique($js_array);
-  }
-
-  /**
-   * Get CSS files for current markup.
+   * Get domain name from url.
    *
-   * @return array
-   *   Array of css files attached to current website marup.
+   * @param string $url
+   *   URL Path that we will extract the domain name of.
+   *
+   * @return string
+   *   Domain name.
    */
-  private function getCSS($markup) {
-    $css_array = [];
-    $page_markup = phpQuery::newDocumentHTML($markup, $charset = 'utf-8');
-    $css = pq("link[rel='stylesheet']", $page_markup);
-
-    foreach ($css as $css_item) {
-      if (!empty(pq($css_item)->attr("href"))) {
-        $css_array[] = pq($css_item)->attr("href");
-      }
-    }
-
-    return array_unique($css_array);
+  private function getDomainFromUrl($url) {
+    $matches = array();
+    preg_match_all("%^(?:https?://)?(?:[^@/n]+@)?(?:www.)?([^:/n]+)%", $url, $matches);
+    return !empty($matches[0][0]) ? $matches[0][0] : '';
   }
 
 }
