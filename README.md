@@ -5,6 +5,10 @@ Simple PHP Crawler created for fun (Its not that useful). This crawler is able t
 You can view the project in the temporary demo link from
 http://crawler.maged.me/web/
 
+![Demo](http://i.imgur.com/qgMpVGW.gif)
+
+
+
 ## INSTALLATION
 To install this Project, you should have `composer` and `npm` installed in your PC. After that, go to main project directory and install `composer` and `npm` packages using :- 
 
