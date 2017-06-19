@@ -1,7 +1,9 @@
 ## OVERVIEW
 Simple PHP Crawler created for fun (Its not that useful). This crawler is able to crawle any website including internal links and display different assets for those website in JSON format. You can extend the retrieved elements and display whatever data you want (see #EXTENDING-ELEMENT section)
 
-
+## DEMO
+You can view the project in the temporary demo link from
+http://crawler.maged.me/web/
 
 ## INSTALLATION
 To install this Project, you should have `composer` and `npm` installed in your PC. After that, go to main project directory and install `composer` and `npm` packages using :- 
