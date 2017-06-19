@@ -7,16 +7,14 @@
 
  use GuzzleHttp\Client;
 
-define('BASE_URL', 'http://localhost/awesome-crawler/web');
-define('POST_PARAM_URLS', 'http://gocardless.com');
-define('POST_PARAM_ELEMENTS', 'images,js');
-define('RESPONSE_CONTAIN_VALUE', 'http://gocardless.com/images/logos/box.png');
-
-
 /**
  * Test case for ElementsController.
  */
 class ElementsControllerTest extends \PHPUnit_Framework_TestCase {
+  private $base_url = 'http://localhost/awesome-crawler/web'; // Replace it with your local directory path
+  private $post_param_urls = 'http://gocardless.com'; // Parameter value
+  private $post_param_elements = 'images,js'; // Parameter value
+  private $response_contain_value = 'http://gocardless.com/images/logos/box.png'; // Expected output compare
 
   /**
    * Test Post Request to a specific URL.
@@ -25,10 +23,10 @@ class ElementsControllerTest extends \PHPUnit_Framework_TestCase {
     // Create our http client (Guzzle)
     $client = new Client();
 
-    $response = $client->request('POST', BASE_URL . '/ajax/elements', [
+    $response = $client->request('POST', $this->base_url . '/ajax/elements', [
       'form_params' => [
-        'urls' => POST_PARAM_URLS,
-        'elements' => POST_PARAM_ELEMENTS,
+        'urls' => $this->post_param_urls,
+        'elements' => $this->post_param_elements,
       ],
     ]);
 
@@ -36,7 +34,7 @@ class ElementsControllerTest extends \PHPUnit_Framework_TestCase {
     $data = json_decode($response->getBody(TRUE), TRUE);
     $this->assertNotEmpty($data, "Empty response body");
     $this->assertGreaterThan(0, count($data), "Empty Response Array");
-    $this->assertContains(RESPONSE_CONTAIN_VALUE, $data[0]['assets'], "Response doesn't contain : " . RESPONSE_CONTAIN_VALUE);
+    $this->assertContains($this->response_contain_value, $data[0]['assets'], "Response doesn't contain : " . $this->response_contain_value);
 
   }
 

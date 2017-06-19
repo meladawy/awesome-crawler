@@ -7,15 +7,13 @@
 
  use GuzzleHttp\Client;
 
-define('BASE_URL', 'http://localhost/awesome-crawler/web');
-define('POST_PARAM_URL', 'http://gocardless.com');
-define('RESPONSE_CONTAIN_VALUE', 'http://gocardless.com/about/');
-
-
 /**
  * Test case for LinksController.
  */
 class LinksControllerTest extends \PHPUnit_Framework_TestCase {
+  private $base_url = 'http://localhost/awesome-crawler/web'; // Replace it with your local directory path
+  private $post_param_url = 'http://gocardless.com'; // Parameter value
+  private $response_contain_value = 'http://gocardless.com/about/'; // Expected output compare
 
   /**
    * Test Post Request to a specific URL.
@@ -24,9 +22,9 @@ class LinksControllerTest extends \PHPUnit_Framework_TestCase {
     // Create our http client (Guzzle)
     $client = new Client();
 
-    $response = $client->request('POST', BASE_URL . '/ajax/links', [
+    $response = $client->request('POST', $this->base_url . '/ajax/links', [
       'form_params' => [
-        'url' => POST_PARAM_URL,
+        'url' => $this->post_param_url,
       ],
     ]);
 
@@ -34,7 +32,7 @@ class LinksControllerTest extends \PHPUnit_Framework_TestCase {
     $data = json_decode($response->getBody(TRUE), TRUE);
     $this->assertNotEmpty($data, "Empty response body");
     $this->assertGreaterThan(0, count($data), "Empty Response Array");
-    $this->assertContains(RESPONSE_CONTAIN_VALUE, $data, "Response doesn't contain : " . RESPONSE_CONTAIN_VALUE);
+    $this->assertContains($this->response_contain_value, $data, "Response doesn't contain : " . $this->response_contain_value);
   }
 
 }
