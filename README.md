@@ -34,7 +34,7 @@ This project is based on a custom created MVC structure. However, its not 100% c
 ## FOLDERS STRUCTURE
 This project is more inspired by Symfony folders structure with some customizations. Lets see how it look :-
 
-1. `/app` : Most of application login including any custom functions should be done through this file
+1. `/app` : Most of application logic including any custom functions should be done through this file
     * `/app/controllers` : Contain all controller functions that handle different routes. You can define a new route from `/config/routes.php` and then create related Controller class in this directory.
     * `/app/elements` : Here you can define your own crawling elements that will be displayed from the parsed website. You can define a new element form `config/elements.php` and then create related class in this directory. However, this will be explained below
     * `/app/helpers` : Custom helpers functions that used in your controller to achieve a specific task (E.g JsonHelper class that help me parsing different JSON output)
